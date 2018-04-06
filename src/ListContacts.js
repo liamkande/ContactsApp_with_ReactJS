@@ -1,4 +1,4 @@
-import React, {Component }from 'react'
+import React, { Component }from 'react'
 import PropTypes from 'prop-types'
 
 class ListContacts extends Component {
@@ -15,20 +15,45 @@ updateQuery = (query) => {
     query: query.trim()
   }))
 }
+
+clearQuery = () => this.updateQuery('')
+
   render() {
+    // Destructor
+    const { query } = this.state
+    const { contacts, onDeleteContact } = this.props
+
+    const showingcontacts = query === ''
+    ? contacts
+    : contacts.filter((c) => (
+      c.name.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+    ))
+
     return (
       <div className='list-contacts'>
-        //{JSON.stringify(this.state)}
         <div className='list-contacts-top'>
           <input className='search-contacts'
                  type='text'
                  placeholder='Search-contacts'
-                 value={this.state.query}
+                 value={query}
                  onChange={(event) => this.updateQuery(event.target.value)}
            />
         </div>
+
+        {
+          // if you never seen && its called the guard up Operator all it does
+          // is the following code will only execute if the previous condition
+          // is true
+          showingcontacts.length !== contacts.length && (
+          <div className='showing-contacts'>
+            <span>Now showing {showingcontacts.length} of {
+              contacts.length}</span>
+              <button onClick={this.clearQuery}>Show all</button>
+          </div>
+        )}
+
         <ol className='contact-list'>
-          {this.props.contacts.map((contact) => (
+          {showingcontacts.map((contact) => (
             <li key={contact.id} className='contact-list-item'>
               <div className='contact-avatar'
                    style={{
@@ -40,7 +65,7 @@ updateQuery = (query) => {
                      <p>{contact.handle}</p>
                    </div>
                    <button className='contact-remove'
-                           onClick={() => this.props.onDeleteContact(contact)}
+                           onClick={() => onDeleteContact(contact)}
                      >
                      Remove
                    </button>
